@@ -27,21 +27,17 @@ end
 % Physical constants
 % Graph Variables
 pens = [animatedline('LineWidth', 2, 'Color','y'),animatedline('LineWidth', 2, 'Color','b'),animatedline('LineWidth', 2, 'Color','magenta'),animatedline('LineWidth', 2, 'Color','g'),animatedline('LineWidth', 2, 'Color','r'),animatedline('LineWidth', 2),animatedline('LineWidth', 2),animatedline('LineWidth', 2),animatedline('LineWidth', 2)];
-set(gca,'XLim', [-1836100000000 1836100000000],'YLim', [-1836100000000 1836100000000],'ZLim', [-1836100000000 1836100000000]);  
-
+set(gca,'XLim', [-18361*10^7 18361*10^7],'YLim', [-18361*10^7 18361*10^7],'ZLim', [-18361*10^7 18361*10^7]);  
 
 % Time constants
-delta_t = 60 * 60;
+delta_t = 60 * 30;
 
 % Universal Gravitational Constant
 G = 6.673 * 10^-11;
-    
-% Graph Variables
  
-% Write your code here
+
 % Loop through code for each second
-for t=1:stop_time
-    
+for t=1:stop_time   
     for planetA=1:length(p)
     
         % Retrieve data from supplied data
@@ -91,10 +87,7 @@ for t=1:stop_time
         % Draw positions of planet
         addpoints(pens(planetA), p(planetA,1), p(planetA,2), p(planetA,3));
         drawnow(); 
-    end
-    
-    
-    
+    end   
 end
   
 
