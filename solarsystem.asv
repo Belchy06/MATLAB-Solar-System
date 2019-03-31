@@ -142,9 +142,6 @@ function simulate3DSystem()
 
             p(planetA,:) = newPlanetAPosition;
             v(planetA,:) = newPlanetAVelocity;
-            
-            % Maybe make simulatesystem and animate system to remove this
-            % if statement
             % Draw positions of planet
             if hide_animation == false
                 plotPlanet(pens(planetA), p(planetA, 1), p(planetA, 2), p(planetA, 3));
@@ -153,8 +150,7 @@ function simulate3DSystem()
     end
 end
 
-% Split this method into two seperate functions to remove if statement and
-% gain performance
+% Split thi
 function plotPlanet(pen, x, y, z)
     if isnan(z)
         addpoints(pen, x, y);  
