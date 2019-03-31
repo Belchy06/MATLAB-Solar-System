@@ -1,19 +1,34 @@
-function [p, v] = solarsystem(p, v, mass, stop_time, hide_animation)
+function [p, v, e] = solarsystem(p, v, mass, stop_time, hide_animation)
   
 if nargin < 5
     hide_animation = false;
 end
 
 % Graph Constants
-graphBounds = 2.2 * 10^11;
-pens = [animatedline('LineWidth', 2),animatedline('LineWidth', 4, 'Color','c'),animatedline('LineWidth', 2, 'Color',[1 0.5 0]),animatedline('LineWidth', 3, 'Color','y'),animatedline('LineWidth', 4, 'Color','r'),animatedline('LineWidth', 2),animatedline('LineWidth', 2),animatedline('LineWidth', 2),animatedline('LineWidth', 2)];
+graphBounds = 20 * 10^11;
+pens = [animatedline('LineWidth', 2),
+        animatedline('LineWidth', 4, 'Color','c'),
+        animatedline('LineWidth', 2, 'Color',[1 0.5 0]),
+        animatedline('LineWidth', 3, 'Color','y'),
+        animatedline('LineWidth', 4, 'Color','r'),
+        animatedline('LineWidth', 2),
+        animatedline('LineWidth', 2),
+        animatedline('LineWidth', 2),
+        animatedline('LineWidth', 2),
+        animatedline('LineWidth', 2),
+        animatedline('LineWidth', 4)];
 set(gca,'XLim', [-graphBounds graphBounds],'YLim', [-graphBounds graphBounds],'ZLim', [-graphBounds graphBounds]);  
+
 % Time Constant
 delta_t = 1800;
 
 % Universal Gravitational Constant
 G = 6.673 * 10^-11;
- 
+
+% Initialize Variables
+kineticEnergy = 0;
+potentialEnergy = 0;
+
 ArrayDimensions = size(p,2);
 
 switch ArrayDimensions
@@ -94,7 +109,9 @@ function animate3DSystem()
             planetAPosition = [p(planetA,1), p(planetA,2), p(planetA,3)];
             planetAVelocity = [v(planetA,1), v(planetA,2), v(planetA,3)];
             planetAMass = mass(planetA);
-
+            
+            planetAKinetic = 0.5 * planetAMass * norm(planetAVelocity);
+            
             for planetB=(planetA+1):length(p)
                 % Retrieve data from supplied data
                 planetBPosition = [p(planetB,1), p(planetB,2), p(planetB,3)];
@@ -117,14 +134,18 @@ function animate3DSystem()
                 % as the direction is just reversed. No need to recalculate components
                 gravityVectorArray.x(planetA,planetB) = gravityVector(1) * -1;
                 gravityVectorArray.y(planetA,planetB) = gravityVector(2) * -1;
-                gravityVectorArray.z(planetA,planetB) = gravityVector(3) * -1;  
+                gravityVectorArray.z(planetA,planetB) = gravityVector(3) * -1; 
+                
+                potentialEnergy = -G * ((planetAMass * planetBMass) / distanceVectorMagnitude);
+                potentialEnergyArray(planetB, planetA) = potentialEnergy;
+                potentialEnergyArray(planetA, planetB) = potentialEnergy;
+            
             end
-
             % Total Gravity in xyz components that affects planetA
             totalGravity.x = sum(gravityVectorArray.x(:,planetA));
             totalGravity.y = sum(gravityVectorArray.y(:,planetA));
             totalGravity.z = sum(gravityVectorArray.z(:,planetA));
-        
+            
             % Move total gravity into an array of acceleration values
             gravitationalAcceleration = [totalGravity.x/planetAMass totalGravity.y/planetAMass totalGravity.z/planetAMass];
             newPlanetAVelocity = planetAVelocity + (delta_t * gravitationalAcceleration);
@@ -132,6 +153,8 @@ function animate3DSystem()
 
             p(planetA,:) = newPlanetAPosition;
             v(planetA,:) = newPlanetAVelocity;
+            kineticEnergy(planetA) = planetAKinetic;
+            potentialEnergy(planetA) = sum(potentialEnergyArray(:,planetA));
             
             % Draw positions of planet
             plot3DPlanet(pens(planetA), p(planetA, 1), p(planetA, 2), p(planetA, 3));     
@@ -247,6 +270,9 @@ function plot3DPlanet(pen, x, y, z)
     drawnow(); 
 end
 
+
+% Calculate Final Energy Values
+e = sum(kineticEnergy) + sum(potentialEnergy);
 end
     
 

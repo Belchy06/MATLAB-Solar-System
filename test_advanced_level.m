@@ -66,7 +66,7 @@ Test_3D_Solar_System(true);
 
         % Run the program
         tic();
-        [final_p, final_v] = unit_under_test(p, v, mass, 400*24*60*60, speed_test);
+        [final_p, final_v, final_e] = unit_under_test(p, v, mass, 400*24*60*60, speed_test);
         t = toc();
         test_result('Execution time', t, 's');
         
