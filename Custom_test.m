@@ -86,7 +86,7 @@ Test_3D_Solar_System(true);
         
         % Run the program
         tic();
-        [final_error] = unit_under_test(p, v, e, mass, 60, speed_test);
+        [final_p, final_v, final_error] = unit_under_test(p, v, e, mass, 400 * 24 * 60 *60, speed_test);
         t = toc();
         test_result('Execution time', t, 's');
         test_result('Deviation between initial energy in system and final energy', final_error, '%', @le, 5);

@@ -1,4 +1,4 @@
-function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
+function [p, v, e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
   
     if nargin < 6
         hide_animation = false;
@@ -24,7 +24,7 @@ function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
             animatedline('LineWidth', 4)];
     
     % Time Constant
-    delta_t = 1;
+    delta_t = 60*60;
     
     % Universal Gravitational Constant
     G = 6.673 * 10^-11;
@@ -62,25 +62,25 @@ function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     end
     
     function calculateTotal2DEnergy()
-        for planetA=1:length(p)
-            planetAMass = mass(planetA);
-            planetAPosition = [p(planetA,1), p(planetA,2)];
-            planetAVelocity = [v(planetA,1), v(planetA,2)];
+        for planetI=1:length(p)
+            planetIMass = mass(planetI);
+            planetIPosition = [p(planetI,1), p(planetI,2)];
+            planetIVelocity = [v(planetI,1), v(planetI,2)];
     
-            for planetB=(planetA+1):length(p)
-                planetBMass = mass(planetB)
-                planetBPosition = [p(planetB,1), p(planetB,2)];
-                distanceVector = planetBPosition - planetAPosition;
+            for planetJ=(planetI+1):length(p)
+                planetJMass = mass(planetJ)
+                planetJPosition = [p(planetJ,1), p(planetJ,2)];
+                distanceVector = planetJPosition - planetIPosition;
                 distanceVectorMagnitude = sqrt(distanceVector(1)^2 + distanceVector(2)^2);
     
                 % Calculate Potential Energy between two objects
-                potentialEnergy = -G * ((planetAMass * planetBMass) / distanceVectorMagnitude);
-                initialEnergyArray(planetB, planetA) = potentialEnergy;
-                initialEnergyArray(planetA, planetB) = potentialEnergy;
+                potentialEnergy = -G * ((planetIMass * planetJMass) / distanceVectorMagnitude);
+                initialEnergyArray(planetJ, planetI) = potentialEnergy;
+                initialEnergyArray(planetI, planetJ) = potentialEnergy;
             end
     
-            kineticEnergy(planetA) = planetAKinetic;
-            potentialEnergy(planetA) = sum(initialEnergyArray(:,planetA));
+            kineticEnergy(planetI) = planetIKinetic;
+            potentialEnergy(planetI) = sum(initialEnergyArray(:,planetI));
         end
     
         if firstRun
@@ -95,26 +95,26 @@ function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     end
     
     function calculateTotal3DEnergy()
-        for planetA=1:length(p)
-            planetAMass = mass(planetA);
-            planetAPosition = [p(planetA,1), p(planetA,2), p(planetA,3)];
-            planetAVelocity = [v(planetA,1), v(planetA,2), v(planetA,3)];
-            planetAKinetic = 0.5 * planetAMass * sqrt(planetAVelocity(1)^2 + planetAVelocity(2)^2 + planetAVelocity(3)^2)^2;
+        for planetI=1:length(p)
+            planetIMass = mass(planetI);
+            planetIPosition = [p(planetI,1), p(planetI,2), p(planetI,3)];
+            planetIVelocity = [v(planetI,1), v(planetI,2), v(planetI,3)];
+            planetIKinetic = 0.5 * planetIMass * sqrt(planetIVelocity(1)^2 + planetIVelocity(2)^2 + planetIVelocity(3)^2)^2;
     
-            for planetB=(planetA+1):length(p)
-                planetBMass = mass(planetB);
-                planetBPosition = [p(planetB,1), p(planetB,2), p(planetB,3)];
-                distanceVector = planetBPosition - planetAPosition;
+            for planetJ=(planetI+1):length(p)
+                planetJMass = mass(planetJ);
+                planetJPosition = [p(planetJ,1), p(planetJ,2), p(planetJ,3)];
+                distanceVector = planetJPosition - planetIPosition;
                 distanceVectorMagnitude = sqrt(distanceVector(1)^2 + distanceVector(2)^2 + distanceVector(3)^2);
     
                 % Calculate Potential Energy between two objects
-                potentialEnergy = -G * ((planetAMass * planetBMass) / distanceVectorMagnitude);
-                initialEnergyArray(planetB, planetA) = potentialEnergy;
-                initialEnergyArray(planetA, planetB) = potentialEnergy;
+                potentialEnergy = -G * ((planetIMass * planetJMass) / distanceVectorMagnitude);
+                initialEnergyArray(planetJ, planetI) = potentialEnergy;
+                initialEnergyArray(planetI, planetJ) = potentialEnergy;
             end
     
-            kineticEnergy(planetA) = planetAKinetic;
-            potentialEnergy(planetA) = sum(initialEnergyArray(:,planetA));
+            kineticEnergy(planetI) = planetIKinetic;
+            potentialEnergy(planetI) = sum(initialEnergyArray(:,planetI));
         end
     
         if firstRun == true
@@ -131,48 +131,48 @@ function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     % Animate Solar System
     function animate2DSystem()
         % Loop through code for each second
-        for t=1:stop_time   
-            for planetA=1:length(p)
+        for t=1:delta_t:stop_time   
+            for planetI=1:length(p)
                 % Retrieve data from supplied data
-                planetAPosition = [p(planetA,1), p(planetA,2)];
-                planetAVelocity = [v(planetA,1), v(planetA,2)];
-                planetAMass = mass(planetA);
+                planetIPosition = [p(planetI,1), p(planetI,2)];
+                planetIVelocity = [v(planetI,1), v(planetI,2)];
+                planetIMass = mass(planetI);
                 
-                for planetB=(planetA+1):length(p)      
+                for planetJ=(planetI+1):length(p)      
                     % Retrieve data from supplied data
-                    planetBPosition = [p(planetB,1), p(planetB,2)];
-                    planetBMass = mass(planetB);
+                    planetJPosition = [p(planetJ,1), p(planetJ,2)];
+                    planetJMass = mass(planetJ);
     
                     % Calculate necessary values as defined in assignment sheet
-                    distanceVector = planetBPosition - planetAPosition;
+                    distanceVector = planetJPosition - planetIPosition;
                     distanceVectorMagnitude = sqrt(distanceVector(1)^2 + distanceVector(2)^2);
     
-                    gravityVector = ((G * planetAMass * planetBMass) / (distanceVectorMagnitude^3)) * distanceVector;
+                    gravityVector = ((G * planetIMass * planetJMass) / (distanceVectorMagnitude^3)) * distanceVector;
                 
                     % Gravity Vector from planet B -> A
-                    gravityVectorArray.x(planetB,planetA) = gravityVector(1);
-                    gravityVectorArray.y(planetB,planetA) = gravityVector(2);
+                    gravityVectorArray.x(planetJ,planetI) = gravityVector(1);
+                    gravityVectorArray.y(planetJ,planetI) = gravityVector(2);
     
                     % Gravity Vector from planet A -> B is just the inverse of
                     % B -> A
-                    gravityVectorArray.x(planetA,planetB) = gravityVector(1) * -1;
-                    gravityVectorArray.y(planetA,planetB) = gravityVector(2) * -1;
+                    gravityVectorArray.x(planetI,planetJ) = gravityVector(1) * -1;
+                    gravityVectorArray.y(planetI,planetJ) = gravityVector(2) * -1;
                 end
     
-                % Total Gravity in xyz components that affects planetA
-                totalGravity.x = sum(gravityVectorArray.x(:,planetA));
-                totalGravity.y = sum(gravityVectorArray.y(:,planetA));
+                % Total Gravity in xyz components that affects planetI
+                totalGravity.x = sum(gravityVectorArray.x(:,planetI));
+                totalGravity.y = sum(gravityVectorArray.y(:,planetI));
             
                 % Move total gravity into an array of acceleration values
-                gravitationalAcceleration = [totalGravity.x/planetAMass totalGravity.y/planetAMass];
-                newPlanetAVelocity = planetAVelocity + (delta_t * gravitationalAcceleration);
-                newPlanetAPosition = planetAPosition + (newPlanetAVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
+                gravitationalAcceleration = [totalGravity.x/planetIMass totalGravity.y/planetIMass];
+                newplanetIVelocity = planetIVelocity + (delta_t * gravitationalAcceleration);
+                newplanetIPosition = planetIPosition + (newplanetIVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
     
-                p(planetA,:) = newPlanetAPosition;
-                v(planetA,:) = newPlanetAVelocity;
+                p(planetI,:) = newplanetIPosition;
+                v(planetI,:) = newplanetIVelocity;
     
                 % Draw positions of planet
-                plot2DPlanet(pens(planetA), p(planetA, 1), p(planetA, 2)); 
+                plot2DPlanet(pens(planetI), p(planetI, 1), p(planetI, 2)); 
             end   
         end
         calculateTotal2DEnergy();
@@ -180,52 +180,52 @@ function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     
     function animate3DSystem()
         % Loop through code for each second
-        for t=1:stop_time   
-            for planetA=1:length(p)    
+        for t=1:delta_t:stop_time   
+            for planetI=1:length(p)    
                 % Retrieve data from supplied data
-                planetAPosition = [p(planetA,1), p(planetA,2), p(planetA,3)];
-                planetAVelocity = [v(planetA,1), v(planetA,2), v(planetA,3)];
-                planetAMass = mass(planetA);
+                planetIPosition = [p(planetI,1), p(planetI,2), p(planetI,3)];
+                planetIVelocity = [v(planetI,1), v(planetI,2), v(planetI,3)];
+                planetIMass = mass(planetI);
                 
-                for planetB=(planetA+1):length(p)
+                for planetJ=(planetI+1):length(p)
                     % Retrieve data from supplied data
-                    planetBPosition = [p(planetB,1), p(planetB,2), p(planetB,3)];
-                    planetBMass = mass(planetB);
+                    planetJPosition = [p(planetJ,1), p(planetJ,2), p(planetJ,3)];
+                    planetJMass = mass(planetJ);
     
                     % Calculate necessary values as defined in assignment sheet
-                    distanceVector = planetBPosition - planetAPosition;
+                    distanceVector = planetJPosition - planetIPosition;
                     distanceVectorMagnitude = sqrt(distanceVector(1)^2 + distanceVector(2)^2 + distanceVector(3)^2);
     
-                    gravityVector = ((G * planetAMass * planetBMass) / (distanceVectorMagnitude^3)) * distanceVector;
+                    gravityVector = ((G * planetIMass * planetJMass) / (distanceVectorMagnitude^3)) * distanceVector;
                 
                     % Gravity Vector from planet B -> A
                     % Positive value as specified in assginment sheet
-                    gravityVectorArray.x(planetB,planetA) = gravityVector(1);
-                    gravityVectorArray.y(planetB,planetA) = gravityVector(2);
-                    gravityVectorArray.z(planetB,planetA) = gravityVector(3);
+                    gravityVectorArray.x(planetJ,planetI) = gravityVector(1);
+                    gravityVectorArray.y(planetJ,planetI) = gravityVector(2);
+                    gravityVectorArray.z(planetJ,planetI) = gravityVector(3);
     
                     % Gravity Vector from planet A -> B
                     % Negative value can be achieved by multiplying gravity vector component by -1
                     % as the direction is just reversed. No need to recalculate components
-                    gravityVectorArray.x(planetA,planetB) = gravityVector(1) * -1;
-                    gravityVectorArray.y(planetA,planetB) = gravityVector(2) * -1;
-                    gravityVectorArray.z(planetA,planetB) = gravityVector(3) * -1;                 
+                    gravityVectorArray.x(planetI,planetJ) = gravityVector(1) * -1;
+                    gravityVectorArray.y(planetI,planetJ) = gravityVector(2) * -1;
+                    gravityVectorArray.z(planetI,planetJ) = gravityVector(3) * -1;                 
                 end
-                % Total Gravity in xyz components that affects planetA
-                totalGravity.x = sum(gravityVectorArray.x(:,planetA));
-                totalGravity.y = sum(gravityVectorArray.y(:,planetA));
-                totalGravity.z = sum(gravityVectorArray.z(:,planetA));
+                % Total Gravity in xyz components that affects planetI
+                totalGravity.x = sum(gravityVectorArray.x(:,planetI));
+                totalGravity.y = sum(gravityVectorArray.y(:,planetI));
+                totalGravity.z = sum(gravityVectorArray.z(:,planetI));
                 
                 % Move total gravity into an array of acceleration values
-                gravitationalAcceleration = [totalGravity.x/planetAMass totalGravity.y/planetAMass totalGravity.z/planetAMass];
-                newPlanetAVelocity = planetAVelocity + (delta_t * gravitationalAcceleration);
-                newPlanetAPosition = planetAPosition + (newPlanetAVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
+                gravitationalAcceleration = [totalGravity.x/planetIMass totalGravity.y/planetIMass totalGravity.z/planetIMass];
+                newplanetIVelocity = planetIVelocity + (delta_t * gravitationalAcceleration);
+                newplanetIPosition = planetIPosition + (newplanetIVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
     
-                p(planetA,:) = newPlanetAPosition;
-                v(planetA,:) = newPlanetAVelocity;
+                p(planetI,:) = newplanetIPosition;
+                v(planetI,:) = newplanetIVelocity;
                
                 % Draw positions of planet
-                plot3DPlanet(pens(planetA), p(planetA, 1), p(planetA, 2), p(planetA, 3));     
+                plot3DPlanet(pens(planetI), p(planetI, 1), p(planetI, 2), p(planetI, 3));     
             end   
         end
         calculateTotal3DEnergy();
@@ -235,45 +235,45 @@ function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     % Simulate Solar System
     function simulate2DSystem()
         % Loop through code for each second
-        for t=1:stop_time   
-            for planetA=1:length(p)
+        for t=1:delta_t:stop_time   
+            for planetI=1:length(p)
                 % Retrieve data from supplied data
-                planetAPosition = [p(planetA,1), p(planetA,2)];
-                planetAVelocity = [v(planetA,1), v(planetA,2)];
-                planetAMass = mass(planetA);
+                planetIPosition = [p(planetI,1), p(planetI,2)];
+                planetIVelocity = [v(planetI,1), v(planetI,2)];
+                planetIMass = mass(planetI);
     
-                for planetB=(planetA+1):length(p)      
+                for planetJ=(planetI+1):length(p)      
                     % Retrieve data from supplied data
-                    planetBPosition = [p(planetB,1), p(planetB,2)];
-                    planetBMass = mass(planetB);
+                    planetJPosition = [p(planetJ,1), p(planetJ,2)];
+                    planetJMass = mass(planetJ);
     
                     % Calculate necessary values as defined in assignment sheet
-                    distanceVector = planetBPosition - planetAPosition;
+                    distanceVector = planetJPosition - planetIPosition;
                     distanceVectorMagnitude = sqrt(distanceVector(1)^2 + distanceVector(2)^2);
     
-                    gravityVector = ((G * planetAMass * planetBMass) / (distanceVectorMagnitude^3)) * distanceVector;
+                    gravityVector = ((G * planetIMass * planetJMass) / (distanceVectorMagnitude^3)) * distanceVector;
                 
                     % Gravity Vector from planet B -> A
-                    gravityVectorArray.x(planetB,planetA) = gravityVector(1);
-                    gravityVectorArray.y(planetB,planetA) = gravityVector(2);
+                    gravityVectorArray.x(planetJ,planetI) = gravityVector(1);
+                    gravityVectorArray.y(planetJ,planetI) = gravityVector(2);
     
                     % Gravity Vector from planet A -> B is just the inverse of
                     % B -> A
-                    gravityVectorArray.x(planetA,planetB) = gravityVector(1) * -1;
-                    gravityVectorArray.y(planetA,planetB) = gravityVector(2) * -1;
+                    gravityVectorArray.x(planetI,planetJ) = gravityVector(1) * -1;
+                    gravityVectorArray.y(planetI,planetJ) = gravityVector(2) * -1;
                 end
     
-                % Total Gravity in xyz components that affects planetA
-                totalGravity.x = sum(gravityVectorArray.x(:,planetA));
-                totalGravity.y = sum(gravityVectorArray.y(:,planetA));
+                % Total Gravity in xyz components that affects planetI
+                totalGravity.x = sum(gravityVectorArray.x(:,planetI));
+                totalGravity.y = sum(gravityVectorArray.y(:,planetI));
             
                 % Move total gravity into an array of acceleration values
-                gravitationalAcceleration = [totalGravity.x/planetAMass totalGravity.y/planetAMass];
-                newPlanetAVelocity = planetAVelocity + (delta_t * gravitationalAcceleration);
-                newPlanetAPosition = planetAPosition + (newPlanetAVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
+                gravitationalAcceleration = [totalGravity.x/planetIMass totalGravity.y/planetIMass];
+                newplanetIVelocity = planetIVelocity + (delta_t * gravitationalAcceleration);
+                newplanetIPosition = planetIPosition + (newplanetIVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
     
-                p(planetA,:) = newPlanetAPosition;
-                v(planetA,:) = newPlanetAVelocity;
+                p(planetI,:) = newplanetIPosition;
+                v(planetI,:) = newplanetIVelocity;
             end   
         end
         calculateTotal2DEnergy();
@@ -281,50 +281,50 @@ function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     
     function simulate3DSystem()
         % Loop through code for each second
-        for t=1:stop_time   
-            for planetA=1:length(p)    
+        for t=1:delta_t:stop_time   
+            for planetI=1:length(p)    
                 % Retrieve data from supplied data
-                planetAPosition = [p(planetA,1), p(planetA,2), p(planetA,3)];
-                planetAVelocity = [v(planetA,1), v(planetA,2), v(planetA,3)];
-                planetAMass = mass(planetA);
+                planetIPosition = [p(planetI,1), p(planetI,2), p(planetI,3)];
+                planetIVelocity = [v(planetI,1), v(planetI,2), v(planetI,3)];
+                planetIMass = mass(planetI);
     
-                for planetB=(planetA+1):length(p)
+                for planetJ=(planetI+1):length(p)
                     % Retrieve data from supplied data
-                    planetBPosition = [p(planetB,1), p(planetB,2), p(planetB,3)];
-                    planetBMass = mass(planetB);
+                    planetJPosition = [p(planetJ,1), p(planetJ,2), p(planetJ,3)];
+                    planetJMass = mass(planetJ);
     
                     % Calculate necessary values as defined in assignment sheet
-                    distanceVector = planetBPosition - planetAPosition;
+                    distanceVector = planetJPosition - planetIPosition;
                     distanceVectorMagnitude = sqrt(distanceVector(1)^2 + distanceVector(2)^2 + distanceVector(3)^2);
     
-                    gravityVector = ((G * planetAMass * planetBMass) / (distanceVectorMagnitude^3)) * distanceVector;
+                    gravityVector = ((G * planetIMass * planetJMass) / (distanceVectorMagnitude^3)) * distanceVector;
                 
                     % Gravity Vector from planet B -> A
                     % Positive value as specified in assginment sheet
-                    gravityVectorArray.x(planetB,planetA) = gravityVector(1);
-                    gravityVectorArray.y(planetB,planetA) = gravityVector(2);
-                    gravityVectorArray.z(planetB,planetA) = gravityVector(3);
+                    gravityVectorArray.x(planetJ,planetI) = gravityVector(1);
+                    gravityVectorArray.y(planetJ,planetI) = gravityVector(2);
+                    gravityVectorArray.z(planetJ,planetI) = gravityVector(3);
     
                     % Gravity Vector from planet A -> B
                     % Negative value can be achieved by multiplying gravity vector component by -1
                     % as the direction is just reversed. No need to recalculate components
-                    gravityVectorArray.x(planetA,planetB) = gravityVector(1) * -1;
-                    gravityVectorArray.y(planetA,planetB) = gravityVector(2) * -1;
-                    gravityVectorArray.z(planetA,planetB) = gravityVector(3) * -1;                   
+                    gravityVectorArray.x(planetI,planetJ) = gravityVector(1) * -1;
+                    gravityVectorArray.y(planetI,planetJ) = gravityVector(2) * -1;
+                    gravityVectorArray.z(planetI,planetJ) = gravityVector(3) * -1;                   
                 end
     
-                % Total Gravity in xyz components that affects planetA
-                totalGravity.x = sum(gravityVectorArray.x(:,planetA));
-                totalGravity.y = sum(gravityVectorArray.y(:,planetA));
-                totalGravity.z = sum(gravityVectorArray.z(:,planetA));
+                % Total Gravity in xyz components that affects planetI
+                totalGravity.x = sum(gravityVectorArray.x(:,planetI));
+                totalGravity.y = sum(gravityVectorArray.y(:,planetI));
+                totalGravity.z = sum(gravityVectorArray.z(:,planetI));
             
                 % Move total gravity into an array of acceleration values
-                gravitationalAcceleration = [totalGravity.x/planetAMass totalGravity.y/planetAMass totalGravity.z/planetAMass];
-                newPlanetAVelocity = planetAVelocity + (delta_t * gravitationalAcceleration);
-                newPlanetAPosition = planetAPosition + (newPlanetAVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
+                gravitationalAcceleration = [totalGravity.x/planetIMass totalGravity.y/planetIMass totalGravity.z/planetIMass];
+                newplanetIVelocity = planetIVelocity + (delta_t * gravitationalAcceleration);
+                newplanetIPosition = planetIPosition + (newplanetIVelocity * delta_t) + (gravitationalAcceleration .* (0.5 * delta_t^2));
     
-                p(planetA,:) = newPlanetAPosition;
-                v(planetA,:) = newPlanetAVelocity;
+                p(planetI,:) = newplanetIPosition;
+                v(planetI,:) = newplanetIVelocity;
             end   
         end
         calculateTotal3DEnergy();
