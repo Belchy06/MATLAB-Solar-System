@@ -5,7 +5,11 @@ if nargin < 5
 end
 
 % Graph Constants
-graphBounds = 20 * 10^11;
+graphBounds = 3 * 10^11;
+title('Solar System Model');
+xlabel('X'); 
+ylabel('Y'); 
+zlabel('Z');
 pens = [animatedline('LineWidth', 2),
         animatedline('LineWidth', 4, 'Color','c'),
         animatedline('LineWidth', 2, 'Color',[1 0.5 0]),
