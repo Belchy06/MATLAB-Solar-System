@@ -66,7 +66,7 @@ Test_3D_Solar_System(true);
             fprintf('  %28s :  %-15.6g', [parameter ' (' units ')'], value);
         end
 
-        if nargin == 5
+        if nargin == 6
             if comparator(value, benchmark)
                 fprintf('   ** PASS. Meets or exceeds the expectation of %g%s', benchmark, units);
             else
@@ -89,7 +89,7 @@ Test_3D_Solar_System(true);
         [final_error] = unit_under_test(p, v, e, mass, 60, speed_test);
         t = toc();
         test_result('Execution time', t, 's');
-        test_result('Deviation between initial energy in system and final energy', final_error, '%', @le, 5);
+        test_result('', final_error, '%', @le, );
         
     end
 

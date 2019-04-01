@@ -1,4 +1,4 @@
-function [p, v, e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
+function [e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
   
     if nargin < 6
         hide_animation = false;
