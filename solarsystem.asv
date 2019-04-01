@@ -6,11 +6,10 @@ function [p, v, e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     
     % Graph Constants
     graphBounds = 3 * 10^11;
-    set(gcf, 'name', 'Solar System Model');
-    xlabel('X (m)'); 
-    ylabel('Y (m)'); 
-    zlabel('Z (m)');
-    set(gca,'XLim', [-graphBounds graphBounds],'YLim', [-graphBounds graphBounds],'ZLim', [-graphBounds graphBounds]);  
+    title('Solar System Model');
+    xlabel('X'); 
+    ylabel('Y'); 
+    zlabel('Z');
     pens = [animatedline('LineWidth', 2),
             animatedline('LineWidth', 4, 'Color','c'),
             animatedline('LineWidth', 2, 'Color',[1 0.5 0]),
@@ -22,6 +21,7 @@ function [p, v, e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
             animatedline('LineWidth', 2),
             animatedline('LineWidth', 2),
             animatedline('LineWidth', 4)];
+    set(gca,'XLim', [-graphBounds graphBounds],'YLim', [-graphBounds graphBounds],'ZLim', [-graphBounds graphBounds]);  
     
     % Time Constant
     delta_t = 1;
@@ -310,7 +310,12 @@ function [p, v, e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
                     % as the direction is just reversed. No need to recalculate components
                     gravityVectorArray.x(planetA,planetB) = gravityVector(1) * -1;
                     gravityVectorArray.y(planetA,planetB) = gravityVector(2) * -1;
-                    gravityVectorArray.z(planetA,planetB) = gravityVector(3) * -1;                   
+                    gravityVectorArray.z(planetA,planetB) = gravityVector(3) * -1;
+                    
+                    % Pot Energy
+                    potentialEnergy = -G * ((planetAMass * planetBMass) / distanceVectorMagnitude);
+                    potentialEnergyArray(planetB, planetA) = potentialEnergy;
+                    potentialEnergyArray(planetA, planetB) = potentialEnergy;
                 end
     
                 % Total Gravity in xyz components that affects planetA
@@ -325,6 +330,8 @@ function [p, v, e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
     
                 p(planetA,:) = newPlanetAPosition;
                 v(planetA,:) = newPlanetAVelocity;
+                kineticEnergy(planetA) = planetAKinetic;
+                potentialEnergy(planetA) = sum(potentialEnergyArray(:,planetA));     
             end   
         end
         calculateTotal3DEnergy();
@@ -341,8 +348,7 @@ function [p, v, e] = solarsystem(p, v, e, mass, stop_time, hide_animation)
         drawnow(); 
     end
     
-    % Calculate percentage error between inital energy in system and final
-    % energy in system
+
     function calculateEnergyError()
         % Calculate Final Energy Values
         e = abs(finalEnergy - initialEnergy) / initialEnergy;
